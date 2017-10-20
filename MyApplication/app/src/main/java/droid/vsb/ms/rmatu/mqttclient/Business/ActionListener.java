@@ -29,7 +29,7 @@ public class ActionListener implements IMqttActionListener {
      * Actions that can be performed Asynchronously <strong>and</strong> associated with a
      * {@link ActionListener} object
      */
-    enum Action {
+    public enum Action {
         /**
          * Connect Action
          **/
