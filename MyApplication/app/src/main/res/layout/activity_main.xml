@@ -1,21 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     tools:context="droid.vsb.ms.rmatu.mqttclient.MainActivity">
+
+    <EditText
+        android:id="@+id/etTopic"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="/mschat/all/#"/>
 
 
     <Button
+        android:id="@+id/btnSubscribe"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-
+        android:text="@string/btnSubscribe"
         />
 
+    <EditText
+        android:id="@+id/etRecvMessage"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:ems="10"
+        android:inputType="textMultiLine"/>
 
 
-
-
-</RelativeLayout>
+</LinearLayout>
