@@ -8,7 +8,7 @@ public class ConnectConstants {
 
     public static final String serverHostName = "pcfeib425t.vsb.cz";
     public static final int serverPort = 1883;
-    public static final String clientId = "TestClient";
+    public static final String clientId = "Rene-Client";
     public static final String clientHandle = "clientHandle";
 
     public static final String ConnectionStatusProperty = "connectionStatus";

@@ -12,6 +12,7 @@ import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Switch;
+import android.widget.TextView;
 
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
@@ -45,7 +46,7 @@ public class SetupFragment extends Fragment {
 
     private Button btnSubscribe;
     private EditText etTopic;
-    private EditText etRecvMessage;
+    private TextView etRecvMessage;
     private Switch swConnect;
 
     @Nullable
@@ -56,7 +57,7 @@ public class SetupFragment extends Fragment {
 
         btnSubscribe = (Button) view.findViewById(R.id.btnSubscribe);
         etTopic = (EditText) view.findViewById(R.id.etTopic);
-        etRecvMessage = (EditText) view.findViewById(R.id.etRecvMessage);
+        etRecvMessage = (TextView) view.findViewById(R.id.etRecvMessage);
         swConnect = (Switch) view.findViewById(R.id.switchConnect);
 
         Connect();
