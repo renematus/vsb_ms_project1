@@ -1,7 +1,9 @@
 package droid.vsb.ms.rmatu.mqttclient.Business;
 
 import android.content.Context;
+import android.database.Cursor;
 import android.support.annotation.NonNull;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,33 +18,57 @@ import java.util.ArrayList;
 import droid.vsb.ms.rmatu.mqttclient.R;
 
 
-public class MessageListItemAdapter extends ArrayAdapter<ReceivedMessage> {
+public class MessageListItemAdapter extends RecyclerView.Adapter<MessageListItemAdapter.ReceiveMessageHolder> {
 
-    private final Context context;
     private final ArrayList<ReceivedMessage> messages;
+    private LayoutInflater inflater;
 
-    public MessageListItemAdapter(Context context, ArrayList<ReceivedMessage> messages){
-        super(context, R.layout.message_list_item, messages);
-        this.context = context;
+    public MessageListItemAdapter(Context contex, ArrayList<ReceivedMessage> messages) {
+        inflater = LayoutInflater.from(contex);
         this.messages = messages;
-
     }
 
-    @NonNull
     @Override
-    public View getView(final int position, View convertView, @NonNull ViewGroup parent){
-        LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        View rowView = inflater.inflate(R.layout.message_list_item, parent, false);
-        TextView topicTextView = (TextView) rowView.findViewById(R.id.message_topic_text);
-        TextView messageTextView = (TextView) rowView.findViewById(R.id.message_text);
-        TextView dateTextView = (TextView) rowView.findViewById(R.id.message_date_text);
+    public ReceiveMessageHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 
-        messageTextView.setText(new String(messages.get(position).getMessage().getPayload()));
-        topicTextView.setText(String.format("Topic: %1$s", messages.get(position).getTopic()));
+        View view = inflater.inflate(R.layout.message_list_item, parent, false);
+        ReceiveMessageHolder holder = new ReceiveMessageHolder(view);
+        return holder;
+    }
 
-        DateFormat dateTimeFormatter = SimpleDateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
-        String shortDateStamp = dateTimeFormatter.format(messages.get(position).getTimestamp());
-        dateTextView.setText(String.format("Time: %1$s", shortDateStamp));
-        return rowView;
+    @Override
+    public void onBindViewHolder(ReceiveMessageHolder holder, int position) {
+        ReceivedMessage message = messages.get(position);
+        holder.setData(message);
+    }
+
+    @Override
+    public int getItemCount() {
+        return messages.size();
+    }
+
+    class ReceiveMessageHolder extends RecyclerView.ViewHolder
+    {
+        TextView topicTextView;
+        TextView messageTextView;
+        TextView dateTextView;
+
+        public ReceiveMessageHolder(View itemView) {
+            super(itemView);
+
+            topicTextView = (TextView) itemView.findViewById(R.id.message_topic_text);
+            messageTextView = (TextView) itemView.findViewById(R.id.message_text);
+            dateTextView = (TextView) itemView.findViewById(R.id.message_date_text);
+        }
+
+        public void setData(ReceivedMessage message)
+        {
+            messageTextView.setText(new String(message.getMessage().getPayload()));
+            topicTextView.setText(String.format("Topic: %1$s", message.getTopic()));
+
+            DateFormat dateTimeFormatter = SimpleDateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
+            String shortDateStamp = dateTimeFormatter.format(message.getTimestamp());
+            dateTextView.setText(String.format("Time: %1$s", shortDateStamp));
+        }
     }
 }

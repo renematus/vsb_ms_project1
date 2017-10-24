@@ -1,8 +1,12 @@
 package droid.vsb.ms.rmatu.mqttclient;
 
+import android.database.Cursor;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,7 +29,7 @@ public class MessageFragment extends Fragment{
 
     private ArrayList<ReceivedMessage> messages;
     private MessageListItemAdapter messageListAdapter;
-    private ListView messageList;
+    private RecyclerView messageList;
 
     @Nullable
     @Override
@@ -33,11 +37,16 @@ public class MessageFragment extends Fragment{
 
         View view = inflater.inflate(R.layout.message_fragment, container, false);
 
-        messageList = (ListView) view.findViewById(R.id.message_list) ;
+        messageList = (RecyclerView) view.findViewById(R.id.message_list) ;
+
+        LinearLayoutManager mLinearLayoutManagerVertical = new LinearLayoutManager(this.getContext()); // (Context context, int spanCount)
+        mLinearLayoutManagerVertical.setOrientation(LinearLayoutManager.VERTICAL);
+        messageList.setLayoutManager(mLinearLayoutManagerVertical);
+        messageList.setItemAnimator(new DefaultItemAnimator());
 
         Map<String, Connection> connections = Connections.getInstance(this.getActivity())
                 .getConnections();
-        Connection connection = connections.get(ConnectConstants.clientHandle);
+        final Connection connection = connections.get(ConnectConstants.clientHandle);
 
         messages = connection.getMessages();
         messageListAdapter = new MessageListItemAdapter(getActivity(), messages);
@@ -45,6 +54,9 @@ public class MessageFragment extends Fragment{
         connection.addReceivedMessageListner(new IReceivedMessageListener() {
             @Override
             public void onMessageReceived(ReceivedMessage message) {
+
+               // messageListAdapter = new MessageListItemAdapter(getActivity(), connection.getMessages());
+               // messageList.setAdapter(messageListAdapter);
                 messageListAdapter.notifyDataSetChanged();
             }
         });
@@ -52,5 +64,6 @@ public class MessageFragment extends Fragment{
 
         return view;
     }
+
 
 }
