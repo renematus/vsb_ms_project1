@@ -20,8 +20,10 @@ import java.util.ArrayList;
 import droid.vsb.ms.rmatu.mqttclient.Business.ActionListener;
 import droid.vsb.ms.rmatu.mqttclient.Business.Connection;
 import droid.vsb.ms.rmatu.mqttclient.Business.Connections;
+import droid.vsb.ms.rmatu.mqttclient.Business.IReceivedMessageListener;
 import droid.vsb.ms.rmatu.mqttclient.Business.MqttCallbackHandler;
 import droid.vsb.ms.rmatu.mqttclient.Business.MqttTraceCallback;
+import droid.vsb.ms.rmatu.mqttclient.Business.ReceivedMessage;
 import droid.vsb.ms.rmatu.mqttclient.Business.Subscription;
 
 public class MainActivity extends AppCompatActivity {
@@ -31,6 +33,7 @@ public class MainActivity extends AppCompatActivity {
     private final MainActivity mainActivity = this;
     private final ChangeListener changeListener = new ChangeListener();
     private ArrayList<Subscription> subscriptions;
+    private ArrayList<ReceivedMessage> messages;
 
     private Button btnSubscribe;
     private EditText etTopic;
@@ -50,6 +53,7 @@ public class MainActivity extends AppCompatActivity {
         swConnect = (Switch) findViewById(R.id.switchConnect);
 
         subscriptions = new ArrayList<Subscription>();
+
 
         Connect();
 
@@ -83,6 +87,20 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         changeConnectedState(connection.isConnected());
+
+        messages = connection.getMessages();
+        connection.addReceivedMessageListner(new IReceivedMessageListener() {
+            @Override
+            public void onMessageReceived(ReceivedMessage message) {
+                System.out.println("GOT A MESSAGE in history " + new String(message.getMessage().getPayload()));
+                System.out.println("M: " + messages.size());
+
+                String oldMessages = etRecvMessage.getText().toString();
+                etRecvMessage.setText(message.getMessage()+oldMessages);
+
+                //messageListAdapter.notifyDataSetChanged();
+            }
+        });
 
     }
 
