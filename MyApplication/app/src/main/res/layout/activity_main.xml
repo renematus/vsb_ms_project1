@@ -8,41 +8,18 @@
     android:orientation="vertical"
     tools:context="droid.vsb.ms.rmatu.mqttclient.MainActivity">
 
-    <Switch
-        android:id="@+id/switchConnect"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerVertical="true"
-        android:layout_marginRight="5dp"
-        android:text="Connect" />
-
-    <EditText
-        android:id="@+id/etTopic"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="/mschat/all/#"/>
-
-
-    <Button
-        android:id="@+id/btnSubscribe"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/btnSubscribe"
-        />
-
-    <EditText
-        android:id="@+id/etRecvMessage"
+    <android.support.design.widget.TabLayout
+        android:id="@+id/tabs"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:ems="10"
-        android:backgroundTint="@color/colorGray"/>
+        app:tabGravity="fill"
+        app:tabMode="fixed"
+        android:background="@color/colorPrimary"/>
 
-    <ListView
+    <android.support.v4.view.ViewPager
+        android:id="@+id/viewPager"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/message_list"
-        android:choiceMode="singleChoice"/>
-
+        android:layout_height="match_parent"/>
 
 
 </LinearLayout>
