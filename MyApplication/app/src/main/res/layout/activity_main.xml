@@ -33,10 +33,16 @@
     <EditText
         android:id="@+id/etRecvMessage"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:ems="10"
-        android:backgroundTint="@color/colorGray"
-        android:inputType="textMultiLine"/>
+        android:backgroundTint="@color/colorGray"/>
+
+    <ListView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/message_list"
+        android:choiceMode="singleChoice"/>
+
 
 
 </LinearLayout>

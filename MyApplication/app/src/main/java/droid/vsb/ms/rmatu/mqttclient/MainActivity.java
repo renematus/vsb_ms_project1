@@ -8,6 +8,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.Switch;
 
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
@@ -21,6 +22,7 @@ import droid.vsb.ms.rmatu.mqttclient.Business.ActionListener;
 import droid.vsb.ms.rmatu.mqttclient.Business.Connection;
 import droid.vsb.ms.rmatu.mqttclient.Business.Connections;
 import droid.vsb.ms.rmatu.mqttclient.Business.IReceivedMessageListener;
+import droid.vsb.ms.rmatu.mqttclient.Business.MessageListItemAdapter;
 import droid.vsb.ms.rmatu.mqttclient.Business.MqttCallbackHandler;
 import droid.vsb.ms.rmatu.mqttclient.Business.MqttTraceCallback;
 import droid.vsb.ms.rmatu.mqttclient.Business.ReceivedMessage;
@@ -34,10 +36,12 @@ public class MainActivity extends AppCompatActivity {
     private final ChangeListener changeListener = new ChangeListener();
     private ArrayList<Subscription> subscriptions;
     private ArrayList<ReceivedMessage> messages;
+    private MessageListItemAdapter messageListAdapter;
 
     private Button btnSubscribe;
     private EditText etTopic;
     private EditText etRecvMessage;
+    private ListView messageList;
     private Switch swConnect;
 
 
@@ -51,6 +55,8 @@ public class MainActivity extends AppCompatActivity {
         etTopic = (EditText) findViewById(R.id.etTopic);
         etRecvMessage = (EditText) findViewById(R.id.etRecvMessage);
         swConnect = (Switch) findViewById(R.id.switchConnect);
+        messageList=(ListView)  findViewById(R.id.message_list);
+
 
         subscriptions = new ArrayList<Subscription>();
 
@@ -89,19 +95,14 @@ public class MainActivity extends AppCompatActivity {
         changeConnectedState(connection.isConnected());
 
         messages = connection.getMessages();
+        messageListAdapter = new MessageListItemAdapter(this, messages);
+        messageList.setAdapter(messageListAdapter);
         connection.addReceivedMessageListner(new IReceivedMessageListener() {
             @Override
             public void onMessageReceived(ReceivedMessage message) {
-                System.out.println("GOT A MESSAGE in history " + new String(message.getMessage().getPayload()));
-                System.out.println("M: " + messages.size());
-
-                String oldMessages = etRecvMessage.getText().toString();
-                etRecvMessage.setText(message.getMessage()+oldMessages);
-
-                //messageListAdapter.notifyDataSetChanged();
+                messageListAdapter.notifyDataSetChanged();
             }
         });
-
     }
 
     private void changeConnectedState(boolean state){
@@ -184,12 +185,8 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void run() {
 
-                    String oldMessages = etRecvMessage.getText().toString();
-                    etRecvMessage.setText(event.getSource().toString()+oldMessages);
+                    etRecvMessage.setText(event.getSource().toString());
 
-
-                    //Todo: XXX
-                    //mainActivity.drawerFragment.notifyDataSetChanged();
                 }
 
             });
