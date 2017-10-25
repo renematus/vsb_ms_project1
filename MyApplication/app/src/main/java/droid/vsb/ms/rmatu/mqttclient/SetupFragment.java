@@ -27,6 +27,7 @@ import droid.vsb.ms.rmatu.mqttclient.Business.Connection;
 import droid.vsb.ms.rmatu.mqttclient.Business.Connections;
 import droid.vsb.ms.rmatu.mqttclient.Business.IReceivedMessageListener;
 import droid.vsb.ms.rmatu.mqttclient.Business.MessageListItemAdapter;
+import droid.vsb.ms.rmatu.mqttclient.Business.MqttAgent;
 import droid.vsb.ms.rmatu.mqttclient.Business.MqttCallbackHandler;
 import droid.vsb.ms.rmatu.mqttclient.Business.MqttTraceCallback;
 import droid.vsb.ms.rmatu.mqttclient.Business.ReceivedMessage;
@@ -124,9 +125,28 @@ public class SetupFragment extends Fragment {
                 String message = etPublishMessage.getText().toString();
 
                 if (topic!=null && topic.length()>0 && message!=null && message.length() > 0) {
-                    int selectedQos = 1;
-                    boolean retainValue = false;
-                    publish(connection, topic, message, selectedQos, retainValue);
+                    //Insert to Agant
+                    if (!connection.isConnected() || connection.getClient()==null)
+                    {
+                        MqttAgent mqttAgent = new MqttAgent();
+                        MqttAgent.PublishMessage publicMessage = mqttAgent. new PublishMessage(topic, message);
+                        MqttAgent.AddPublishMessage(publicMessage);
+
+                        return;
+                    }
+
+                    try {
+                        int selectedQos = 1;
+                        boolean retainValue = false;
+                        publish(connection, topic, message, selectedQos, retainValue);
+                    }
+                    catch (Exception ex)
+                    {
+                        //In case of error insert to agent
+                        MqttAgent mqttAgent = new MqttAgent();
+                        MqttAgent.PublishMessage publicMessage = mqttAgent. new PublishMessage(topic, message);
+                        MqttAgent.AddPublishMessage(publicMessage);
+                    }
                 }
             }
         });
@@ -313,6 +333,15 @@ public class SetupFragment extends Fragment {
                 //Send status message to broker
                 String statusTopic = String.format("/mschat/status/%s", etIdentity.getText().toString());
                 publish(connection, statusTopic, "online", 1, true);
+
+                //check if there are any pending messages and send them
+                while(MqttAgent.PendingMessageCount() >0)
+                {
+                    MqttAgent.PublishMessage message=  MqttAgent.GetPublishMessage();
+                    publish(connection, message.getTopic(), message.getMessage(), 1, false);
+                }
+
+
             }
 
             getActivity().runOnUiThread(new Runnable() {
