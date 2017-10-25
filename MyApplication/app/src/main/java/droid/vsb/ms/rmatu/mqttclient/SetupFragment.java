@@ -122,10 +122,12 @@ public class SetupFragment extends Fragment {
 
                 String topic = etPublishTopic.getText().toString();
                 String message = etPublishMessage.getText().toString();
-                int selectedQos = 1;
-                boolean retainValue = false;
 
-                publish(connection, topic, message, selectedQos, retainValue);
+                if (topic!=null && topic.length()>0 && message!=null && message.length() > 0) {
+                    int selectedQos = 1;
+                    boolean retainValue = false;
+                    publish(connection, topic, message, selectedQos, retainValue);
+                }
             }
         });
 
@@ -140,6 +142,11 @@ public class SetupFragment extends Fragment {
                     changeConnectedState(true);
                 } else {
                     swConnect.setText("Connect");
+
+                    //Send status message to broker
+                    String statusTopic = String.format("/mschat/status/%s", etIdentity.getText().toString());
+                    publish(connection, statusTopic, "offline", 1, true);
+
                     disconnect(connection);
                     changeConnectedState(false);
                 }
@@ -295,6 +302,14 @@ public class SetupFragment extends Fragment {
             if (!event.getPropertyName().equals(ConnectConstants.ConnectionStatusProperty)) {
                 return;
             }
+
+            //Only for event connected send status to broker
+            if (event.getSource().toString().contains("Connected")) {
+                //Send status message to broker
+                String statusTopic = String.format("/mschat/status/%s", etIdentity.getText().toString());
+                publish(connection, statusTopic, "online", 1, true);
+            }
+
             getActivity().runOnUiThread(new Runnable() {
 
                 @Override
