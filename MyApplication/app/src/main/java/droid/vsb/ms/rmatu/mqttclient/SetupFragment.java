@@ -20,6 +20,7 @@ import org.eclipse.paho.client.mqttv3.MqttException;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
+import java.util.Map;
 
 import droid.vsb.ms.rmatu.mqttclient.Business.ActionListener;
 import droid.vsb.ms.rmatu.mqttclient.Business.Connection;
@@ -39,20 +40,25 @@ public class SetupFragment extends Fragment {
 
     private static final String TAG = SetupFragment.class.getSimpleName();
 
+
     private int temp_qos_value = 0;
     private Connection connection;
     //private final MainActivity mainActivity = this;
     private final ChangeListener changeListener = new ChangeListener();
     private ArrayList<Subscription> subscriptions;
-
+    private MqttConnectOptions connOpts;
 
     private Button btnSubscribe;
     private EditText etTopic;
+    private EditText etIdentity;
     private Button btnPublish;
     private EditText etPublishTopic;
     private EditText etPublishMessage;
     private TextView etRecvMessage;
     private Switch swConnect;
+
+    private EditText etUserName;
+    private EditText etPassword;
 
     @Nullable
     @Override
@@ -60,6 +66,7 @@ public class SetupFragment extends Fragment {
 
         View view = inflater.inflate(R.layout.setup_fragment, container, false);
 
+        etIdentity = (EditText) view.findViewById(R.id.etIdentity);
         btnSubscribe = (Button) view.findViewById(R.id.btnSubscribe);
         etTopic = (EditText) view.findViewById(R.id.etTopic);
         btnPublish = (Button) view.findViewById(R.id.btnPublish);
@@ -67,8 +74,10 @@ public class SetupFragment extends Fragment {
         etPublishMessage = (EditText) view.findViewById(R.id.etPublishMessage);
         etRecvMessage = (TextView) view.findViewById(R.id.etRecvMessage);
         swConnect = (Switch) view.findViewById(R.id.switchConnect);
+        etUserName = (EditText) view.findViewById(R.id.etUserName);
+        etPassword = (EditText) view.findViewById(R.id.etPassword);
 
-        Connect();
+        InitConnection();
 
         btnSubscribe.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -104,15 +113,22 @@ public class SetupFragment extends Fragment {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
+                    swConnect.setText("Disconnect");
+                    Connect();
                     connect(connection);
                     changeConnectedState(true);
                 } else {
+                    swConnect.setText("Connect");
                     disconnect(connection);
                     changeConnectedState(false);
                 }
             }
         });
-        changeConnectedState(connection.isConnected());
+
+        if (connection!=null) {
+            changeConnectedState(connection.isConnected());
+        }
+
 
 
 
@@ -125,7 +141,6 @@ public class SetupFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
 
         subscriptions = new ArrayList<Subscription>();
 
@@ -154,30 +169,51 @@ public class SetupFragment extends Fragment {
 
         try {
             connection.getClient().disconnect();
+            etRecvMessage.setText("Client disconnected");
         } catch( MqttException ex){
             Log.e(TAG, "Exception occurred during disconnect: " + ex.getMessage());
         }
     }
 
-
-
-    public void Connect(){
-        connection = Connection.createConnection(ConnectConstants.clientHandle, ConnectConstants.clientId ,ConnectConstants.serverHostName,ConnectConstants.serverPort, getActivity() ,false);
+    public void InitConnection()
+    {
+        connection = Connection.createConnection(ConnectConstants.clientHandle, etIdentity.getText().toString() ,ConnectConstants.serverHostName,ConnectConstants.serverPort, getActivity() ,false);
         connection.registerChangeListener(changeListener);
         connection.changeConnectionStatus(Connection.ConnectionStatus.CONNECTING);
 
 
         String[] actionArgs = new String[1];
-        actionArgs[0] = ConnectConstants.clientId;
+        actionArgs[0] = etIdentity.getText().toString();
         final ActionListener callback = new ActionListener(getActivity(),
                 ActionListener.Action.CONNECT, connection, actionArgs);
         connection.getClient().setCallback(new MqttCallbackHandler(getActivity(), ConnectConstants.clientHandle));
 
-
-
         connection.getClient().setTraceCallback(new MqttTraceCallback());
 
-        MqttConnectOptions connOpts = new MqttConnectOptions();
+        connOpts = new MqttConnectOptions();
+        connOpts.setConnectionTimeout(80);
+        connOpts.setCleanSession(true);
+        connOpts.setKeepAliveInterval(200);
+
+        byte[] bytes = new byte[1000];
+        connOpts.setWill("topic", bytes,  0, false);
+        //Todo:  upravit podle MqttConnectOptions optionsFromModel(ConnectionModel model)
+
+        connection.addConnectionOptions(connOpts);
+
+        Connections.getInstance(getActivity()).addConnection(connection);
+    }
+
+
+
+    public void Connect(){
+
+        Map<String, Connection> connections = Connections.getInstance(this.getActivity())
+                .getConnections();
+        final Connection connection = connections.get(ConnectConstants.clientHandle);
+
+
+        connOpts = connection.getConnectionOptions();
         connOpts.setConnectionTimeout(80);
         connOpts.setCleanSession(true);
         connOpts.setKeepAliveInterval(200);
@@ -187,10 +223,28 @@ public class SetupFragment extends Fragment {
         //Todo:  upravit podle MqttConnectOptions optionsFromModel(ConnectionModel model)
 
 
+        String userName = etUserName.getText().toString();
+        String password = etPassword.getText().toString();
+
+        if (userName!=null && userName.length()>0)
+        {
+            connOpts.setUserName(userName);
+        }
+        else
+        {
+            connOpts.setUserName(null);
+        }
+
+        if (password!=null && password.length()>0)
+        {
+            connOpts.setPassword(password.toCharArray());
+        }
+        else
+        {
+            connOpts.setPassword(null);
+        }
 
         connection.addConnectionOptions(connOpts);
-        Connections.getInstance(getActivity()).addConnection(connection);
-
     }
 
     public void publish(Connection connection, String topic, String message, int qos, boolean retain){
