@@ -23,6 +23,7 @@
 
     <string name="notifyTitle">MQTT Message Received</string>
     <string name="notifyTitle_connectionLost">MQTT Client Has Lost Connection</string>
-    <string name="btnSubscribe">Subscribe</string>
+    <string name="btnSubscribe">Subs</string>
     <string name="btnPublish">Publish</string>
+    <string name="btnUnSubscribe">Remove</string>
 </resources>

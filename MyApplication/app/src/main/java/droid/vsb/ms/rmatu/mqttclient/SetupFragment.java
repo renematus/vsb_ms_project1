@@ -49,6 +49,7 @@ public class SetupFragment extends Fragment {
     private MqttConnectOptions connOpts;
 
     private Button btnSubscribe;
+    private Button btnUnSubscribe;
     private EditText etTopic;
     private EditText etIdentity;
     private Button btnPublish;
@@ -68,6 +69,7 @@ public class SetupFragment extends Fragment {
 
         etIdentity = (EditText) view.findViewById(R.id.etIdentity);
         btnSubscribe = (Button) view.findViewById(R.id.btnSubscribe);
+        btnUnSubscribe = (Button) view.findViewById(R.id.btnUnSubscribe);
         etTopic = (EditText) view.findViewById(R.id.etTopic);
         btnPublish = (Button) view.findViewById(R.id.btnPublish);
         etPublishTopic = (EditText) view.findViewById(R.id.etPublishTopic);
@@ -83,15 +85,34 @@ public class SetupFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 String topic = etTopic.getText().toString();
+                if (topic !=null && topic.length() >0) {
+                    Subscription subscription = new Subscription(topic, temp_qos_value, connection.handle(), false);
+                    subscriptions.add(subscription);
+                    try {
+                        connection.addNewSubscription(subscription);
 
-                Subscription subscription = new Subscription(topic, temp_qos_value, connection.handle(), false);
-                subscriptions.add(subscription);
-                try {
-                    connection.addNewSubscription(subscription);
-
-                } catch (MqttException ex) {
-                    System.out.println("MqttException whilst subscribing: " + ex.getMessage());
+                    } catch (MqttException ex) {
+                        System.out.println("MqttException whilst subscribing: " + ex.getMessage());
+                    }
                 }
+            }
+        });
+
+        btnUnSubscribe.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String topic = etTopic.getText().toString();
+                if (topic !=null && topic.length() >0) {
+                    Subscription subscription = new Subscription(topic, temp_qos_value, connection.handle(), false);
+                    subscriptions.add(subscription);
+                    try {
+                        connection.unsubscribe(subscription);
+
+                    } catch (MqttException ex) {
+                        System.out.println("MqttException whilst unsubscribing: " + ex.getMessage());
+                    }
+                }
+
             }
         });
 
