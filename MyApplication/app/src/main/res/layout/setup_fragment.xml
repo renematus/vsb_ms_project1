@@ -93,7 +93,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="Topic"
-                android:text=""
+                android:text="/mschat/all/anon"
                 android:layout_marginRight="10dp"/>
 
             <EditText
@@ -107,7 +107,7 @@
 
 
         <Button
-            android:id="@+id/btnPublis"
+            android:id="@+id/btnPublish"
             android:layout_width="0dp"
             android:layout_weight="2"
             android:layout_height="match_parent"

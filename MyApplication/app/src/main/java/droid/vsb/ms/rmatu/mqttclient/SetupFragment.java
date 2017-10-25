@@ -37,6 +37,8 @@ import droid.vsb.ms.rmatu.mqttclient.Business.Subscription;
 
 public class SetupFragment extends Fragment {
 
+    private static final String TAG = SetupFragment.class.getSimpleName();
+
     private int temp_qos_value = 0;
     private Connection connection;
     //private final MainActivity mainActivity = this;
@@ -46,6 +48,9 @@ public class SetupFragment extends Fragment {
 
     private Button btnSubscribe;
     private EditText etTopic;
+    private Button btnPublish;
+    private EditText etPublishTopic;
+    private EditText etPublishMessage;
     private TextView etRecvMessage;
     private Switch swConnect;
 
@@ -57,6 +62,9 @@ public class SetupFragment extends Fragment {
 
         btnSubscribe = (Button) view.findViewById(R.id.btnSubscribe);
         etTopic = (EditText) view.findViewById(R.id.etTopic);
+        btnPublish = (Button) view.findViewById(R.id.btnPublish);
+        etPublishTopic = (EditText) view.findViewById(R.id.etPublishTopic);
+        etPublishMessage = (EditText) view.findViewById(R.id.etPublishMessage);
         etRecvMessage = (TextView) view.findViewById(R.id.etRecvMessage);
         swConnect = (Switch) view.findViewById(R.id.switchConnect);
 
@@ -75,6 +83,19 @@ public class SetupFragment extends Fragment {
                 } catch (MqttException ex) {
                     System.out.println("MqttException whilst subscribing: " + ex.getMessage());
                 }
+            }
+        });
+
+        btnPublish.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                String topic = etPublishTopic.getText().toString();
+                String message = etPublishMessage.getText().toString();
+                int selectedQos = 1;
+                boolean retainValue = false;
+
+                publish(connection, topic, message, selectedQos, retainValue);
             }
         });
 
@@ -134,7 +155,7 @@ public class SetupFragment extends Fragment {
         try {
             connection.getClient().disconnect();
         } catch( MqttException ex){
-            Log.e("", "Exception occurred during disconnect: " + ex.getMessage());
+            Log.e(TAG, "Exception occurred during disconnect: " + ex.getMessage());
         }
     }
 
@@ -170,6 +191,20 @@ public class SetupFragment extends Fragment {
         connection.addConnectionOptions(connOpts);
         Connections.getInstance(getActivity()).addConnection(connection);
 
+    }
+
+    public void publish(Connection connection, String topic, String message, int qos, boolean retain){
+
+        try {
+            String[] actionArgs = new String[2];
+            actionArgs[0] = message;
+            actionArgs[1] = topic;
+            final ActionListener callback = new ActionListener(getActivity(),
+                    ActionListener.Action.PUBLISH, connection, actionArgs);
+            connection.getClient().publish(topic, message.getBytes(), qos, retain, null, callback);
+        } catch( MqttException ex){
+            Log.e(TAG, "Exception occurred during publish: " + ex.getMessage());
+        }
     }
 
 

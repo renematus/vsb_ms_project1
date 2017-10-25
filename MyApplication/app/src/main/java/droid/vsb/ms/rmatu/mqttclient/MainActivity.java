@@ -34,6 +34,8 @@ import droid.vsb.ms.rmatu.mqttclient.Business.TextTabsAdapter;
 
 public class MainActivity extends AppCompatActivity {
 
+    private static final String TAG = MainActivity.class.getSimpleName();
+
     private List<Fragment> fragmentList = new ArrayList<>();
     private List<String> titleList = new ArrayList<>();
 

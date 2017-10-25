@@ -27,6 +27,8 @@ import droid.vsb.ms.rmatu.mqttclient.Business.ReceivedMessage;
 
 public class MessageFragment extends Fragment{
 
+    private static final String TAG = MessageFragment.class.getSimpleName();
+
     private ArrayList<ReceivedMessage> messages;
     private MessageListItemAdapter messageListAdapter;
     private RecyclerView messageList;
