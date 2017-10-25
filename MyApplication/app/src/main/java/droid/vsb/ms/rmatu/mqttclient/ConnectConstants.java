@@ -12,4 +12,9 @@ public class ConnectConstants {
 
     public static final String ConnectionStatusProperty = "connectionStatus";
 
+
+    public static final String LastWillTopic = "/mschat/will/last";
+
+    public static final String LastWillMessage = "Last messege from RM";
+
 }

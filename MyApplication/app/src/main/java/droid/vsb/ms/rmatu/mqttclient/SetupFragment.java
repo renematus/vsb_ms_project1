@@ -272,6 +272,11 @@ public class SetupFragment extends Fragment {
             connOpts.setPassword(null);
         }
 
+
+        //Set last will
+        connOpts.setWill(ConnectConstants.LastWillTopic, ConnectConstants.LastWillMessage.getBytes(), 1, true);
+
+
         connection.addConnectionOptions(connOpts);
     }
 
