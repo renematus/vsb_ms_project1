@@ -3,6 +3,7 @@ package droid.vsb.ms.rmatu.mqttclient;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
@@ -32,6 +33,7 @@ public class MessageFragment extends Fragment{
     private ArrayList<ReceivedMessage> messages;
     private MessageListItemAdapter messageListAdapter;
     private RecyclerView messageList;
+    private FloatingActionButton fabClear;
 
     @Nullable
     @Override
@@ -40,6 +42,7 @@ public class MessageFragment extends Fragment{
         View view = inflater.inflate(R.layout.message_fragment, container, false);
 
         messageList = (RecyclerView) view.findViewById(R.id.message_list) ;
+        fabClear=(FloatingActionButton) view.findViewById(R.id.fab_clear);
 
         LinearLayoutManager mLinearLayoutManagerVertical = new LinearLayoutManager(this.getContext()); // (Context context, int spanCount)
         mLinearLayoutManagerVertical.setOrientation(LinearLayoutManager.VERTICAL);
@@ -59,6 +62,14 @@ public class MessageFragment extends Fragment{
 
                // messageListAdapter = new MessageListItemAdapter(getActivity(), connection.getMessages());
                // messageList.setAdapter(messageListAdapter);
+                messageListAdapter.notifyDataSetChanged();
+            }
+        });
+
+        fabClear.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                messages.clear();
                 messageListAdapter.notifyDataSetChanged();
             }
         });
